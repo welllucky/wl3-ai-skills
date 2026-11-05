@@ -13,6 +13,7 @@ Uma skill é uma pasta com um `SKILL.md` (instruções e quando usar), referênc
 ## Estrutura
 
 ```text
+install.sh          instalador das skills nos agentes
 skills/
   <nome-da-skill>/
     SKILL.md        instruções, regras e etapas
@@ -29,24 +30,55 @@ skills/
    cd wl3-ai-skills
    ```
 
-2. Ligue a skill à pasta de skills do Claude Code. O link simbólico mantém a skill atualizada a cada `git pull`:
+2. Rode o instalador e escolha as skills e os agentes no seletor:
 
    ```bash
-   mkdir -p ~/.claude/skills
-   ln -s "$(pwd)/skills/wl3-validar-entrega" ~/.claude/skills/wl3-validar-entrega
+   ./install.sh
    ```
 
-   Para instalar todas as skills de uma vez:
+   Ele cria um link simbólico de cada skill escolhida na pasta de skills de cada agente escolhido. Os agentes encontrados na máquina já vêm marcados.
 
-   ```bash
-   for s in skills/*/; do ln -sfn "$(pwd)/$s" ~/.claude/skills/"$(basename "$s")"; done
-   ```
+3. Abra uma nova sessão do agente. A skill aparece na lista de skills disponíveis.
 
-   Se preferir uma cópia fixa, use `cp -R` no lugar de `ln -s`.
+Para atualizar: `git pull` dentro do repositório (os links acompanham o repositório).
 
-3. Abra uma nova sessão do Claude Code. A skill aparece na lista de skills disponíveis.
+### Agentes suportados
 
-Para atualizar: `git pull` dentro do repositório.
+| Id | Agente | Pasta padrão | Variável para trocar a pasta |
+|---|---|---|---|
+| `claude` | Claude Code | `~/.claude/skills` | `SKILLS_DIR_CLAUDE` |
+| `codex` | OpenAI Codex | `~/.codex/skills` | `SKILLS_DIR_CODEX` |
+| `agents` | Pasta compartilhada entre agentes | `~/.agents/skills` | `SKILLS_DIR_AGENTS` |
+| `gemini` | Gemini CLI | `~/.gemini/skills` | `SKILLS_DIR_GEMINI` |
+| `cursor` | Cursor | `~/.cursor/skills` | `SKILLS_DIR_CURSOR` |
+| `copilot` | GitHub Copilot | `~/.copilot/skills` | `SKILLS_DIR_COPILOT` |
+| `opencode` | OpenCode | `~/.config/opencode/skills` | `SKILLS_DIR_OPENCODE` |
+
+As pastas variam entre versões dos agentes. Se a sua for outra, use a variável: `SKILLS_DIR_CODEX=~/.agents/skills ./install.sh`.
+
+### Opções do instalador
+
+| Opção | Efeito |
+|---|---|
+| `-s, --skills a,b` | skills a instalar (`all` = todas); sem a opção, abre o seletor |
+| `-p, --providers x,y` | agentes (`all` = todos, `detected` = os encontrados na máquina); sem a opção, abre o seletor |
+| `-u, --uninstall` | remove os links e as cópias feitos por este repositório (o resto fica) |
+| `-c, --copy` | copia em vez de criar link |
+| `-f, --force` | substitui o que já existe no destino; pasta real vira backup `.bak-<data>` |
+| `-n, --dry-run` | mostra o que faria, sem alterar nada |
+| `-y, --yes` | não pede confirmação |
+| `-l, --list` | lista skills, agentes e o estado de cada instalação |
+
+Exemplos:
+
+```bash
+./install.sh -s all -p detected -y          # todas as skills nos agentes encontrados
+./install.sh -s wl3-validar-entrega -p claude,codex
+./install.sh -l                             # o que está instalado onde
+./install.sh -u -s all -p all -y            # desinstala tudo
+```
+
+No seletor: digite números ou faixas para marcar e desmarcar (`1 3 5-7`), `a` para todos, `n` para nenhum, Enter para confirmar e `q` para sair. Em ambiente sem terminal interativo (CI, scripts), informe `--skills` e `--providers`.
 
 ## Como usar
 
