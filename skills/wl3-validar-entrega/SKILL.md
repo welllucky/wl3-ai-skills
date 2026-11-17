@@ -98,7 +98,7 @@ Para cada item: defeito real ou artefato do ambiente? Depois classifique: aprova
 
 ## Etapa 7 — Relatório
 
-`evidencias-<card>/reteste-<data>/RELATORIO-RETESTE-<n>.md` conforme `references/modelos.md`, com cenários, testes, `.diff` e prints do momento. Print-resumo (tabela HTML → PNG) só como complemento. Upload das imagens no Git host (endpoint e IDs no perfil), URLs em `prints/uploads.tsv`.
+`evidencias-<card>/reteste-<data>/RELATORIO-RETESTE-<n>.md` conforme `references/modelos.md`, com cenários, testes, `.diff` e prints do momento. Print-resumo (tabela HTML → PNG) só como complemento. Upload das imagens no Git host (endpoint e IDs no perfil), URLs em `prints/uploads.tsv`: na MR use o campo `markdown` do upload (`/uploads/...`), no Jira a URL absoluta; confira a renderização antes de publicar (`references/ambiente-e-scripts.md` › Prints).
 
 ## Etapa 8 — Comunicação (com aprovação)
 
