@@ -77,4 +77,8 @@ Para testes automatizados, worktrees limpos separados (sem patch de harness).
 - **No momento**: screenshot do browser/simulador durante o passo; para API, gravar comando + status + headers + trecho do corpo + horário e renderizar em imagem logo após a chamada. Nome único por captura.
 - **Resumo** (complemento): HTML com tabela → PNG com Chrome headless:
   `"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new --hide-scrollbars --window-size=1150,1400 --screenshot=<png> file://<html>`
-- Upload no Git host para usar a imagem em Jira e MR (GitLab: `curl -H "PRIVATE-TOKEN: <token>" -F file=@<png> https://<gitlab>/api/v4/projects/<id>/uploads` → `full_path`). Host, token e IDs no perfil.
+- Upload no Git host para usar a imagem em Jira e MR. GitLab: `curl -H "PRIVATE-TOKEN: <token>" -F file=@<png> https://<gitlab>/api/v4/projects/<id>/uploads` (`glab api -F` não faz multipart). Host, token e IDs no perfil. A resposta traz dois caminhos, e cada destino usa um:
+  - **Nota de MR/issue no mesmo projeto**: o campo `markdown` (ou `url`), no formato `/uploads/<hash>/<arquivo>`. Nunca o `full_path` (`/-/project/<id>/uploads/...`): no Markdown do GitLab, link que começa com `/` é relativo ao projeto, e esse caminho vira `/<grupo>/<projeto>/-/blob/<branch>/-/project/...`, que dá imagem quebrada.
+  - **Fora do GitLab (Jira, relatório)**: URL absoluta `https://<gitlab>` + `full_path`. Só abre para quem está logado no GitLab.
+  - Grave as duas em `prints/uploads.tsv` (`arquivo`, `markdown`, `url absoluta`).
+  - Antes de publicar, confira a renderização: `glab api -X POST markdown -f text="$(cat nota.md)" -F gfm=true -f project=<grupo/projeto>` e verifique que nenhum `data-src` contém `/-/blob/`. Se já publicou, corrija editando a mesma nota (`PUT projects/<id>/merge_requests/<iid>/notes/<note_id>`).

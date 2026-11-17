@@ -1,6 +1,6 @@
 # Modelos
 
-Jira: cloudId, tipo de issue de bug, projeto e labels vêm do perfil local. Bug = filho da história, responsável = dev da entrega, prioridade pela gravidade, labels da área (`back`, `bff`, `site`, `app`, ...). Imagem: link do upload no Git host em markdown; o MCP do Jira não anexa arquivo.
+Jira: cloudId, tipo de issue de bug, projeto e labels vêm do perfil local. Bug = filho da história, responsável = dev da entrega, prioridade pela gravidade, labels da área (`back`, `bff`, `site`, `app`, ...). Imagem: link do upload no Git host; o MCP do Jira não anexa arquivo. No Jira, URL absoluta (`https://<gitlab>` + `full_path`); na MR, o campo `markdown` do upload (`/uploads/<hash>/<arquivo>`). Ver `ambiente-e-scripts.md` › Prints.
 
 ## Bug
 
@@ -32,7 +32,7 @@ Encontrado no reteste de <data> da `<branch>` @ `<sha>` (MR !<n>). <efeito>. <po
 
 ## 📎 Evidências
 `evidencias-<card>/reteste-<data>/cenarios/...`
-![](<url do print>)
+[<nome do print>](<url absoluta: https://<gitlab> + full_path>)
 ```
 
 ## Comentário de subtarefa
@@ -50,13 +50,15 @@ Testado em `<branch>` @ `<sha>` (<commits relevantes>).
 **Ressalvas / pontos para o PO:** ...
 
 Evidências: `<caminhos>`
-![](<url do print>)
+[<nome do print>](<url absoluta: https://<gitlab> + full_path>)
 ```
 
 ## Nota de MR
 
 ```markdown
 ## Reteste <n> (<data>) · `<sha>` · **<APROVADO|REPROVADO ...>**
+
+<!-- imagens: ![<cenário>](/uploads/<hash>/<arquivo>), campo `markdown` do upload; nunca /-/project/<id>/uploads/... -->
 
 ### ❌ <card do bug> · <título>
 <causa em 2-3 linhas, números, link do card>

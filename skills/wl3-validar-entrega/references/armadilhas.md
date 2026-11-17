@@ -40,3 +40,20 @@ Genéricas. As específicas de uma empresa ficam no perfil local (`~/.claude/hom
 - **Subtarefa finalizada sem entrega**: conferir no código, não no status.
 - **MR de outro ambiente desatualizada**.
 - **Testes unitários com mock** não pegam concorrência nem integração com código do destino.
+
+## App iOS: parâmetro pré-codificado chega com dupla codificação
+- Sintoma: o back recebe `%7C` literal (o app enviou `%257C`); vale para qualquer parâmetro que o app passa por `encodeURIComponent` quando **outro** valor da mesma URL vai cru (espaço, acento).
+- Causa: URL inválida → o iOS (NSURL, iOS 17+) recodifica a URL inteira, inclusive o `%`. Teste unitário com axios mockado não pega.
+- Como achar: proxy registrando o `path` cru; comparar termo de uma palavra × termo com espaço.
+
+## Simulador: `launch` não derruba processo antigo de outro container
+- Sintoma: depois de instalar o build novo, o app ainda chama a URL/porta do build anterior.
+- Conferir `ps -o lstart` do processo e `simctl get_app_container`; `simctl terminate` + `kill` do PID antigo antes de testar.
+
+## Site: token forjado e captura de rede (2026-11)
+- Forjar o cookie do token com a página do app aberta dispara um refresh na própria página antes do reload e mascara o teste. Forjar numa rota sem JS do app (ex.: `/robots.txt` do mesmo host) e só depois navegar.
+- Cookies não são isolados por porta: um login em `localhost:3000` vale para `localhost:3002` (MR × base com uma sessão só). localStorage é isolado por porta.
+- O painel de rede do navegador embutido não lista chamadas cross-origin (API remota). Usar `performance.getEntriesByType('resource')` (`responseStatus`, `startTime`, `responseEnd`).
+- Estado de componente sem expor store: subir pela fibra React (`__reactFiber*`) do elemento até achar o prop desejado.
+- `glab api -F file=@x` não faz multipart: upload de imagem via `curl -F` com o token do `glab config get token`.
+- Imagem quebrada na nota da MR: link com o `full_path` do upload (`/-/project/<id>/uploads/...`) é resolvido como arquivo do repositório (`/-/blob/<branch>/...`). Na MR usar o campo `markdown` (`/uploads/<hash>/<arquivo>`); `full_path` só como URL absoluta fora do GitLab.
