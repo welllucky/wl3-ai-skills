@@ -1,6 +1,6 @@
 ---
 name: wl3-validar-entrega
-description: Homologa (testa, valida, retesta) uma entrega de desenvolvimento ponta a ponta — back, BFF, site e app — a partir de um card do Jira ou de uma lista de MRs/PRs. Lê o fluxo completo, monta ambiente (local com harness ou remoto), executa matriz de cenários com prints no momento do teste, compara com a base, classifica achados, gera relatório e, com aprovação do usuário, abre bugs, comenta e move status no Jira e no GitLab/GitHub. Use quando o usuário pedir para homologar, testar, validar, retestar ou revisar uma entrega, uma MR, um card ou uma correção de bug, ou disser "houve ajustes, teste de novo".
+description: Homologa (testa, valida, retesta) uma entrega de desenvolvimento ponta a ponta — back, BFF, site e app — a partir de um card do Jira ou de uma lista de MRs/PRs. Lê o fluxo completo, monta ambiente (local com harness ou remoto), exige feature flag em toda funcionalidade nova (sem flag, barra a entrega e pede a inserção ao dev), executa matriz de cenários com prints no momento do teste e cada flag ligada e desligada, compara com a base, classifica achados, gera relatório e, com aprovação do usuário, abre bugs, comenta e move status no Jira e no GitLab/GitHub. Use quando o usuário pedir para homologar, testar, validar, retestar ou revisar uma entrega, uma MR, um card ou uma correção de bug, ou disser "houve ajustes, teste de novo".
 ---
 
 # wl3-validar-entrega
@@ -26,6 +26,8 @@ Referências (leia quando a etapa pedir):
 
 ## Regras fixas
 
+- **Feature flag é obrigatória em funcionalidade nova.** Todo comportamento novo da entrega (tela, componente, fluxo, regra, endpoint, integração, consulta nova) fica atrás de uma feature flag que, desligada, devolve o comportamento anterior. Funcionalidade nova sem flag, ou com parte do caminho novo fora da flag, **barra a homologação**: veredito `BLOQUEADO: sem feature flag`, nenhum cenário funcional é executado e o pedido de inserção da flag vai ao dev (modelo em `references/modelos.md`, com a aprovação de envio da regra de ações externas). Correção de bug e refatoração sem mudança de comportamento não exigem flag nova; na dúvida se é funcionalidade nova, pergunte ao usuário antes de seguir.
+- **Toda flag é testada ligada e desligada**, sem exceção: os dois estados entram na matriz, com print de cada um. Desligada = comportamento da base, sem chamada, consulta, evento ou layout novos. Um estado que não pôde ser testado impede o veredito `APROVADO`.
 - Afirmação do dev é hipótese, não fato. Toda afirmação vira cenário medido.
 - Acontece em produção → incidente. Não acontece → bug (o tipo de issue e o pai vêm do perfil). Conferir produção (só leitura: GET, headers, logs) antes de classificar e registrar o porquê.
 - Ações externas **só com aprovação explícita do usuário**, uma vez por rodada, depois de mostrar o resumo: criar card ou subtarefa, mudar status no Jira, comentar no Jira, comentar no Git host. Achou bug no meio do teste: anote e conte no final, não abra.
@@ -44,9 +46,9 @@ Referências (leia quando a etapa pedir):
 4. **Localize os repositórios** de cada ponta afetada (pastas do perfil). Faltou algum: avise e pergunte se o usuário clona ou se você clona.
 5. Leia descrição, critérios de aceite, critérios de reteste das subtarefas, comentários anteriores (último reteste, pontos com o PO) e a mensagem do dev sobre o ajuste.
 6. Liste as afirmações do dev ("sem cache", "anônimo não manda null", "latência igual ou melhor") e transforme cada uma em hipótese testável.
-7. Liste as feature flags envolvidas (nome, onde é lida, valor no ambiente escolhido).
+7. Liste as funcionalidades novas da entrega e a feature flag de cada uma (nome, serviço, onde é lida em cada ponta, valor no ambiente escolhido, como ligar e desligar nesse ambiente). Funcionalidade nova sem flag citada no card, na MR ou no código: marque como **sem flag**; o portão da etapa 2 confirma.
 
-Saída: tabela com card, subtarefas abertas, MRs (repo, origem → destino, SHA do head), flags, ambiente escolhido, hipóteses.
+Saída: tabela com card, subtarefas abertas, MRs (repo, origem → destino, SHA do head), funcionalidades novas × flag, ambiente escolhido, hipóteses.
 
 ## Etapa 1 — Versões
 
@@ -64,7 +66,17 @@ Saída: SHAs, commits novos, divergências entre ambientes.
 2. Parte não implementada (critério sem código, ponta sem MR, flag sem consumidor, subtarefa finalizada sem entrega): **pergunte** se entra no teste ou fica fora do escopo.
 3. Anote suspeitas; cada uma vira cenário. Procure sempre: concorrência (tarefas em paralelo sobre recurso com escopo, como DbContext), chave de cache (compartilhada entre usuários?), caminho legado ainda ativo, revisita e recarga, prazos e retentativa, entrada vinda do cliente (cookie, query), chaves que precisam bater entre SSR e cliente, valores literais "undefined"/"null" vindos do front, regra de exibição que depende de texto em vez de tipo.
 
-Saída: mapa do fluxo + lista de suspeitas.
+4. **Cobertura da flag**: para cada funcionalidade nova, siga o caminho novo em todas as pontas e confirme que a flag o protege por inteiro. Procure: código novo alcançável com a flag desligada (chamada, consulta, evento de analytics, migração, job, rota), ponta que não lê a flag (back protegido, app não), flag lida só no front com o back já mudando o contrato para todos, valor padrão ligado quando o serviço de flags falha, flag que não volta ao comportamento da base.
+
+Saída: mapa do fluxo + lista de suspeitas + cobertura da flag por funcionalidade (protegida / parcial / sem flag).
+
+### Portão de feature flag
+
+Antes da etapa 3, com o resultado da etapa 0 (item 7) e da etapa 2 (item 4):
+
+- Toda funcionalidade nova protegida por flag nas pontas que ela toca: siga.
+- Alguma funcionalidade nova **sem flag** ou com **cobertura parcial**: pare aqui. Não monte ambiente nem execute cenário funcional. Mostre ao usuário o veredito `BLOQUEADO: sem feature flag`, a lista (funcionalidade, ponta, arquivo/linha do caminho sem proteção) e o pedido ao dev pronto (modelo "Pedido de feature flag" em `references/modelos.md`). Com a aprovação, publique o pedido no card e na MR e, se o perfil permitir, devolva o card ao dev. Reteste só depois que a flag entrar; a rodada seguinte recomeça na etapa 1.
+- O usuário decide liberar sem flag (exceção do time): registre a decisão, quem decidiu e o motivo no relatório e no comentário do card; a exceção não muda o teste dos dois estados de qualquer outra flag da entrega.
 
 ## Etapa 3 — Ambiente
 
@@ -79,7 +91,7 @@ Saída: ambiente de pé, com SHA, portas, modos dos stubs e patches aplicados re
 
 ## Etapa 4 — Matriz de cenários
 
-Leia `references/matriz-cenarios.md`. Monte a matriz a partir de: critérios de aceite e de reteste + hipóteses da etapa 0 + suspeitas da etapa 2 + regressão do que já foi aprovado + flag ligada e desligada. Use só os grupos que fazem sentido para a entrega. Mostre a matriz ao usuário antes de executar quando ela for nova (primeira rodada).
+Leia `references/matriz-cenarios.md`. Monte a matriz a partir de: critérios de aceite e de reteste + hipóteses da etapa 0 + suspeitas da etapa 2 + regressão do que já foi aprovado + cada flag ligada e desligada (obrigatório, nunca "não se aplica" em entrega com flag). Use só os grupos que fazem sentido para a entrega. Mostre a matriz ao usuário antes de executar quando ela for nova (primeira rodada).
 
 ## Etapa 5 — Execução e coleta
 
@@ -94,7 +106,7 @@ Leia `references/matriz-cenarios.md`. Monte a matriz a partir de: critérios de 
 
 ## Etapa 6 — Análise
 
-Para cada item: defeito real ou artefato do ambiente? Depois classifique: aprovado, reprovado, intermitente, regressão, ponto para o PO (diferente do descrito sem quebrar critério), fora de escopo. Bug × incidente. Gravidade. Causa raiz com arquivo/método e por que não apareceu antes.
+Para cada item: defeito real ou artefato do ambiente? Depois classifique: aprovado, reprovado, bloqueado (sem feature flag ou flag com cobertura parcial), intermitente, regressão, ponto para o PO (diferente do descrito sem quebrar critério), fora de escopo. Bug × incidente. Gravidade. Causa raiz com arquivo/método e por que não apareceu antes.
 
 ## Etapa 7 — Relatório
 
@@ -116,4 +128,4 @@ Mostre ao usuário: veredito, bugs propostos, comentários por card e por MR, tr
 
 ## Fechamento de cada rodada
 
-Termine com: veredito, tabela por item (resultado + evidência), achados novos, pontos para o PO, o que não foi testado e por quê, e a pergunta de aprovação da etapa 8.
+Termine com: veredito, tabela de flags (funcionalidade, flag, resultado ligada, resultado desligada), tabela por item (resultado + evidência), achados novos, pontos para o PO, o que não foi testado e por quê, e a pergunta de aprovação da etapa 8.
