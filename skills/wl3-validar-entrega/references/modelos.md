@@ -77,7 +77,13 @@ Evidências: `<caminhos>`
 
 ### Testes automatizados
 MR × base, falhas comparadas por nome.
+
+### 📎 Evidências
+![<cenário>-<passo>](/uploads/<hash>/<arquivo>)
+`evidencias-<card>/reteste-<data>/cenarios/...`
 ```
+
+Todo modelo deste arquivo leva evidência (regra fixa da `SKILL.md`): nenhum bug, comentário ou nota sai sem pelo menos um print do momento do teste por cenário citado.
 
 ## Pedido de feature flag
 
@@ -99,6 +105,10 @@ Analisado em `<branch>` @ `<sha>` (MR !<n>) em <data>. A homologação não segu
 
 ### Próximo passo
 Com a flag na MR, o reteste testa a entrega com a flag ligada e desligada.
+
+### 📎 Evidências
+* [`<arquivo>:<linha>`](<link para a linha no diff da MR>): <o que roda sem flag>
+* <print do comportamento novo ativo sem flag que o desligue, quando já houver ambiente de pé>
 ```
 
 ## Relatório da rodada (`RELATORIO-RETESTE-<n>.md`)

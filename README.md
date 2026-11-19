@@ -95,7 +95,7 @@ No seletor: digite números ou faixas para marcar e desmarcar (`1 3 5-7`), `a` p
 4. **Ambiente e matriz:** monta o ambiente, propõe a matriz de cenários e mostra antes de executar. Cada flag entra ligada e desligada, sempre.
 5. **Execução:** roda os cenários e tira o print no momento de cada passo, de sucesso ou de falha.
 6. **Relatório:** grava o relatório em `evidencias-<card>/reteste-<data>/`, com cenários, prints e testes automatizados comparados com a base.
-7. **Comunicação:** mostra o veredito e os bugs propostos e **só então**, com o seu ok, abre bugs, comenta no Jira e nas MRs e move status.
+7. **Comunicação:** mostra o veredito e os bugs propostos e **só então**, com o seu ok, abre bugs, comenta no Jira e nas MRs e move status. Todo bug, comentário e nota de MR sai com a evidência (prints do momento do teste, SHA testado e caminho dos cenários); sem evidência, nada é publicado.
 
 ### Primeira execução: perfil local
 

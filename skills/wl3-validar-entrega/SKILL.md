@@ -31,6 +31,7 @@ Referências (leia quando a etapa pedir):
 - Afirmação do dev é hipótese, não fato. Toda afirmação vira cenário medido.
 - Acontece em produção → incidente. Não acontece → bug (o tipo de issue e o pai vêm do perfil). Conferir produção (só leitura: GET, headers, logs) antes de classificar e registrar o porquê.
 - Ações externas **só com aprovação explícita do usuário**, uma vez por rodada, depois de mostrar o resumo: criar card ou subtarefa, mudar status no Jira, comentar no Jira, comentar no Git host. Achou bug no meio do teste: anote e conte no final, não abra.
+- **Evidência sempre publicada no card e na MR.** Todo registro externo leva a evidência do que afirma: bug, comentário em história e subtarefa, nota de MR (inclusive das MRs de outros ambientes), pedido de feature flag e comentário que acompanha mudança de status. Evidência = print do momento do teste (tela ou captura de API) de cada cenário citado, sucesso e falha, com os dois estados de cada flag; mais o SHA testado e o caminho do JSON do cenário. Pedido de feature flag: link para `arquivo:linha` no diff da MR do caminho sem proteção. Imagem sobe pelo Git host (Jira com URL absoluta, MR com o campo `markdown` do upload) e a renderização é conferida antes de publicar. Sem evidência, não publique: gere a evidência ou diga ao usuário o que falta. Conferir depois de publicar que as imagens abrem no Jira e na MR.
 - Mudança de status: tente a transição. Se o workflow ou a permissão impedir, informe a transição que falhou e o status em que o card ficou.
 - Nunca push, merge ou force-push em branch protegida. Merge local para testar é permitido em worktree temporário.
 - Nunca trabalhar no worktree principal do usuário. Worktrees de teste ficam no scratchpad.
@@ -114,11 +115,12 @@ Para cada item: defeito real ou artefato do ambiente? Depois classifique: aprova
 
 ## Etapa 8 — Comunicação (com aprovação)
 
-Mostre ao usuário: veredito, bugs propostos, comentários por card e por MR, transições de status. Após o ok:
-1. Bugs com o tipo de issue do perfil, como filhos da história, responsável = dev da entrega.
-2. Comentário em cada subtarefa testada e na história, com print.
-3. Nota em cada MR, inclusive as de outros ambientes afetados.
-4. Transições de status; informe as que falharem.
+Mostre ao usuário: veredito, bugs propostos, comentários por card e por MR (com as imagens já enviadas e renderizadas), transições de status. Após o ok:
+1. Bugs com o tipo de issue do perfil, como filhos da história, responsável = dev da entrega, com os prints da falha e da base.
+2. Comentário em cada subtarefa testada e na história, com os prints dos cenários e dos dois estados de cada flag.
+3. Nota em cada MR, inclusive as de outros ambientes afetados, com os mesmos prints.
+4. Transições de status, cada uma com o comentário de evidência no card; informe as que falharem.
+5. Abra cada card e MR publicados e confira que as imagens aparecem; quebrada, corrija editando o mesmo comentário ou nota.
 
 ## Etapa 9 — Encerramento
 
