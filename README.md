@@ -91,10 +91,11 @@ No seletor: digite números ou faixas para marcar e desmarcar (`1 3 5-7`), `a` p
 
 1. **Entrada:** você informa o card ou as MRs. A skill pergunta em qual ambiente testar (local, dev, QAS/staging, sandbox) e confere se os repositórios estão clonados.
 2. **Leitura:** lê os critérios do card, os comentários e o código do fluxo completo, e transforma cada afirmação do dev em um cenário que pode ser medido.
-3. **Ambiente e matriz:** monta o ambiente, propõe a matriz de cenários e mostra antes de executar.
-4. **Execução:** roda os cenários e tira o print no momento de cada passo, de sucesso ou de falha.
-5. **Relatório:** grava o relatório em `evidencias-<card>/reteste-<data>/`, com cenários, prints e testes automatizados comparados com a base.
-6. **Comunicação:** mostra o veredito e os bugs propostos e **só então**, com o seu ok, abre bugs, comenta no Jira e nas MRs e move status.
+3. **Portão de feature flag:** toda funcionalidade nova precisa estar atrás de uma feature flag que, desligada, devolve o comportamento anterior. Sem flag (ou com parte do caminho novo fora dela), a homologação para em `BLOQUEADO: sem feature flag` e a skill prepara o pedido de inserção para o dev.
+4. **Ambiente e matriz:** monta o ambiente, propõe a matriz de cenários e mostra antes de executar. Cada flag entra ligada e desligada, sempre.
+5. **Execução:** roda os cenários e tira o print no momento de cada passo, de sucesso ou de falha.
+6. **Relatório:** grava o relatório em `evidencias-<card>/reteste-<data>/`, com cenários, prints e testes automatizados comparados com a base.
+7. **Comunicação:** mostra o veredito e os bugs propostos e **só então**, com o seu ok, abre bugs, comenta no Jira e nas MRs e move status.
 
 ### Primeira execução: perfil local
 

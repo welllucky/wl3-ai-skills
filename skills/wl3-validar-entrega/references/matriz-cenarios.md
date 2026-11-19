@@ -14,7 +14,7 @@ Fontes da matriz: critérios de aceite e de reteste de cada subtarefa, afirmaç�
 | Recuperação | falha seguida de sucesso: a falha não fica presa (cache, marca) | 500 → próxima chamada já recupera |
 | Relógio | hora do servidor × aparelho, resposta em cache (`Date`, `Age`) | servidor adiantado 30 min; `Age` 600 |
 | Compatibilidade | clientes antigos (sem parâmetro novo), versões de contrato | app antigo sem o campo novo |
-| Feature flag | ligada e desligada, e a troca com o app aberto | flag OFF = layout antigo e nenhuma consulta nova |
+| Feature flag (obrigatório) | cada flag ligada e desligada, em todas as pontas que a leem; a troca com o app/página aberto; serviço de flags fora (valor padrão) | flag OFF = layout antigo, nenhuma chamada, consulta ou evento novos, igual à base; flag ON = critérios de aceite |
 | Robustez | entrada malformada, adulterada, grande, versão desconhecida | parâmetro com versão inexistente, IDs fora do domínio |
 | Cache e privacidade | um usuário recebe o resultado de outro? chave inclui o dono? endpoint que não pode ter cache tem? | anônimo B recebe o resultado do anônimo A; `X-Cache` e `Cache-Control` |
 | Contrato com parceiro | payload que realmente sai (campos nulos, literais "undefined") | `"opaqueUserId": "undefined"` |
@@ -31,6 +31,7 @@ Fontes da matriz: critérios de aceite e de reteste de cada subtarefa, afirmaç�
 - Todo critério de aceite e de reteste do card vira pelo menos um cenário.
 - Toda afirmação do dev vira um cenário que pode refutá-la.
 - Toda suspeita da leitura vira um cenário.
-- Toda feature flag da entrega é testada ligada e desligada.
+- Toda funcionalidade nova tem feature flag (portão da etapa 2 da `SKILL.md`). Sem flag, não há matriz: a rodada para em `BLOQUEADO: sem feature flag`.
+- Toda feature flag da entrega é testada ligada **e** desligada, com print dos dois estados. Desligada, o resultado é comparado com a base (mesmo layout, mesmas chamadas, mesmos eventos). Os critérios de aceite rodam com a flag ligada; a regressão roda com ela desligada. O grupo Feature flag nunca é "não se aplica" quando a entrega tem flag, e um estado "não testado" impede o `APROVADO`.
 - Regressão: repetir pelo menos um cenário de cada item já aprovado nas rodadas anteriores.
 - Grupo que não se aplica à entrega: registrar "não se aplica" no relatório; o que se aplica mas não pôde ser testado: registrar "não testado" e o motivo.
